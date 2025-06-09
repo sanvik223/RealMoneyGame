@@ -2,6 +2,8 @@ import { auth, database } from './firebase-config.js';
 import {
   ref,
   set,
+  get,
+  update,
   onValue,
   remove
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
@@ -67,7 +69,7 @@ function showPrivateRoomUI(game, code) {
 
 // Copy Game Code
 window.copyGameCode = function (game) {
-  const code = document.getElementById(`${game}-game-code`).innerText;
+  const code = document.getElementById(`${game}-room-code`).innerText;
   navigator.clipboard.writeText(code).then(() => {
     alert("Copied: " + code);
   });
@@ -97,10 +99,36 @@ window.cancelPrivateRoom = function (game) {
   hideAllPopups();
 }
 
-// Start Game
+// Start Game (with Turnover update)
 window.startGame = function (game) {
-  alert(`Starting ${game.toUpperCase()} game...`);
-  // You can redirect or embed actual game page here
+  const user = auth.currentUser;
+  if (!user) return alert("Not logged in!");
+
+  // Example: Fixed entry fee (can be dynamic)
+  const entryFee = 10;
+
+  // Deduct entry fee from balance
+  const userRef = ref(database, 'users/' + user.uid);
+  get(userRef).then(snapshot => {
+    const userData = snapshot.val();
+    if (!userData) return;
+
+    const currentBalance = userData.balance || 0;
+    if (currentBalance < entryFee) {
+      return alert("Insufficient balance!");
+    }
+
+    const newBalance = currentBalance - entryFee;
+    const updatedTurnover = (userData.totalTurnover || 0) + entryFee;
+
+    update(userRef, {
+      balance: newBalance,
+      totalTurnover: updatedTurnover
+    }).then(() => {
+      alert(`Starting ${game.toUpperCase()} game...\nTurnover +৳${entryFee}`);
+      // You can redirect or embed game here
+    });
+  });
 }
 
 // Join Random Players
