@@ -1,1 +1,187 @@
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3f37c9;
+  --accent-color: #4895ef;
+  --success-color: #4cc9f0;
+  --danger-color: #f72585;
+  --warning-color: #f8961e;
+  --light-color: #f8f9fa;
+  --dark-color: #212529;
+  --gold-color: #ffd700;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  --wood-color: #5c4033;
+}
 
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: url('../assets/images/background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: none; /* Hidden until splash */
+}
+
+/* Splash Screen */
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d, #1a2a6c);
+  background-size: 300% 300%;
+  animation: gradientBG 8s ease infinite;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.splash-logo {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.splash-loader {
+  width: 60px;
+  height: 60px;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--gold-color);
+  animation: spin 1s linear infinite;
+  margin-top: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.splash-subtext {
+  margin-top: 1.5rem;
+  color: white;
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* Auth Form Container */
+.auth-container {
+  width: 90%;
+  max-width: 400px;
+  margin: auto;
+  margin-top: 60px;
+  padding: 25px;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.auth-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.auth-container input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.auth-container input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.auth-container button {
+  width: 100%;
+  padding: 10px;
+  background: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.auth-container button:hover {
+  background: var(--secondary-color);
+}
+
+.form-switcher {
+  text-align: center;
+  margin-top: 10px;
+  color: var(--gold-color);
+  cursor: pointer;
+}
+
+.form-switcher span {
+  text-decoration: underline;
+}
+
+/* Game Card Grid */
+.game-cards-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
+
+.game-card {
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(5px);
+  text-align: center;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.game-card:hover {
+  transform: scale(1.05);
+}
+
+.game-logo {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  object-fit: cover;
+}
+
+.game-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+}
