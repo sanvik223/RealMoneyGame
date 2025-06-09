@@ -47,3 +47,35 @@ window.shareApp = function () {
     alert("Sharing not supported.");
   }
 };
+import { auth, database } from './firebase-config.js';
+import {
+  ref,
+  onValue
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+// Load Profile Info
+function loadUserProfile() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const userRef = ref(database, 'users/' + user.uid);
+  onValue(userRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      document.getElementById('profile-name').innerText = data.name || '';
+      document.getElementById('profile-email').innerText = data.email || '';
+      document.getElementById('profile-phone').innerText = data.phone || '';
+      document.getElementById('profile-balance').innerText = data.balance || 0;
+    }
+  });
+}
+
+// Call it when profile page is shown
+window.showPage = function (id) {
+  document.querySelectorAll('.popup-page').forEach(p => p.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+
+  if (id === 'profile-page') {
+    loadUserProfile();
+  }
+};
