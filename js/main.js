@@ -1,3 +1,11 @@
+// Import Firebase
+import { auth, database } from './firebase-config.js';
+import {
+  ref,
+  onValue,
+  get
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
 // Hide splash after 3 seconds and show body
 window.addEventListener('load', () => {
   setTimeout(() => {
@@ -29,10 +37,15 @@ window.hidePopupMenu = function () {
   document.getElementById('overlay').style.display = 'none';
 };
 
-// Show any section
+// Show any section/page
 window.showPage = function (id) {
   document.querySelectorAll('.popup-page').forEach(p => p.style.display = 'none');
   document.getElementById(id).style.display = 'block';
+
+  // If Profile page, load data
+  if (id === 'profile-page') {
+    loadUserProfile();
+  }
 };
 
 // Share app (for mobile)
@@ -47,11 +60,6 @@ window.shareApp = function () {
     alert("Sharing not supported.");
   }
 };
-import { auth, database } from './firebase-config.js';
-import {
-  ref,
-  onValue
-} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 // Load Profile Info
 function loadUserProfile() {
@@ -69,13 +77,3 @@ function loadUserProfile() {
     }
   });
 }
-
-// Call it when profile page is shown
-window.showPage = function (id) {
-  document.querySelectorAll('.popup-page').forEach(p => p.style.display = 'none');
-  document.getElementById(id).style.display = 'block';
-
-  if (id === 'profile-page') {
-    loadUserProfile();
-  }
-};
