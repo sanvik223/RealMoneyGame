@@ -19,6 +19,7 @@ function showForm(formId) {
 // Register New User
 window.registerUser = function () {
   const name = document.getElementById('name').value.trim();
+  const referralCode = document.getElementById('referral-code').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const email = document.getElementById('register-email').value.trim();
   const password = document.getElementById('register-password').value.trim();
