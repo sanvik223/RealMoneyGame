@@ -37,6 +37,8 @@ window.registerUser = function () {
         phone,
         email,
         balance: 0
+        referrer: referralCode || null,
+referralBonusGiven: false
       });
       alert("Registration successful!");
       showForm('login-form');
