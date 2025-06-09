@@ -1,107 +1,121 @@
 import { auth, database } from './firebase-config.js';
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signOut
-} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import {
   ref,
-  set,
   get,
-  update
+  set,
+  update,
+  onValue
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-// Show specific auth form
-function showForm(formId) {
-  document.querySelectorAll('.auth-container').forEach(f => f.style.display = 'none');
-  document.getElementById(formId).style.display = 'block';
-}
+// ⏳ Hide splash screen after 3s
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash-screen').style.display = 'none';
+    document.body.style.display = 'block';
+  }, 3000);
+});
 
-// Register New User
-window.registerUser = function () {
-  const name = document.getElementById('name').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const email = document.getElementById('register-email').value.trim();
-  const password = document.getElementById('register-password').value.trim();
-  const referralCode = document.getElementById('referral-code').value.trim();
-
-  if (!name || !phone || !email || !password) {
-    alert("Please fill all fields.");
-    return;
+// 🎞️ Auto scroll banner slider
+setInterval(() => {
+  const banner = document.getElementById('home-slider');
+  if (banner) {
+    banner.scrollLeft += 1;
+    if (banner.scrollLeft + banner.clientWidth >= banner.scrollWidth) {
+      banner.scrollLeft = 0;
+    }
   }
+}, 30);
 
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const uid = userCredential.user.uid;
-      set(ref(database, 'users/' + uid), {
-        name,
-        phone,
-        email,
-        balance: 0,
-        referrer: referralCode || null,
-        referralBonusGiven: false,
-        totalTurnover: 0,
-        withdrawnAmount: 0
-      });
-      alert("Registration successful!");
-      showForm('login-form');
-    })
-    .catch((error) => {
-      alert("Error: " + error.message);
-    });
-}
+// 📱 Show menu popup
+window.showMenuPopup = function () {
+  document.getElementById('popup-menu').style.display = 'block';
+  document.getElementById('overlay').style.display = 'block';
+};
 
-// Login User
-window.loginUser = function () {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value.trim();
+// ❌ Hide popup menu
+window.hidePopupMenu = function () {
+  document.getElementById('popup-menu').style.display = 'none';
+  document.getElementById('overlay').style.display = 'none';
+};
 
-  if (!email || !password) {
-    alert("Please enter both email and password.");
-    return;
+// 🔁 Show page by ID
+window.showPage = function (id) {
+  document.querySelectorAll('.popup-page').forEach(p => p.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+
+  // Profile page load
+  if (id === 'profile-page') {
+    loadUserProfile();
   }
+};
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => {
-      document.getElementById('login-form').style.display = 'none';
-      document.getElementById('home-page').style.display = 'block';
-    })
-    .catch((error) => {
-      alert("Login failed: " + error.message);
-    });
-}
-
-// Reset Password
-window.sendPasswordReset = function () {
-  const email = document.getElementById('reset-email').value.trim();
-  if (!email) {
-    alert("Enter your email to reset password.");
-    return;
+// 📤 Share app
+window.shareApp = function () {
+  if (navigator.share) {
+    navigator.share({
+      title: "Real Money Game",
+      text: "Come play and win cash!",
+      url: window.location.href
+    }).catch(err => console.log("Share failed:", err));
+  } else {
+    alert("Sharing not supported on this device.");
   }
+};
 
-  sendPasswordResetEmail(auth, email)
-    .then(() => {
-      alert("Reset email sent! Check your inbox.");
-      showForm('login-form');
-    })
-    .catch((error) => {
-      alert("Error: " + error.message);
-    });
-}
+// 👤 Load Profile Info
+function loadUserProfile() {
+  const user = auth.currentUser;
+  if (!user) return;
 
-// Logout
-window.logoutUser = function () {
-  signOut(auth).then(() => {
-    alert("Logged out successfully.");
-    showForm('login-form');
-    document.getElementById('home-page').style.display = 'none';
-  }).catch((error) => {
-    alert("Error: " + error.message);
+  const userRef = ref(database, 'users/' + user.uid);
+  onValue(userRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      document.getElementById('profile-name').innerText = data.name || '';
+      document.getElementById('profile-email').innerText = data.email || '';
+      document.getElementById('profile-phone').innerText = data.phone || '';
+      document.getElementById('profile-balance').innerText = data.balance || 0;
+    }
   });
 }
 
-// Initial load
-document.addEventListener('DOMContentLoaded', () => {
-  showForm('login-form');
-});
+// 💸 Withdraw with turnover validation
+window.submitWithdraw = function () {
+  const withdrawAmount = parseInt(document.getElementById('withdraw-amount').value);
+  const user = auth.currentUser;
+  if (!user || isNaN(withdrawAmount) || withdrawAmount <= 0) {
+    alert("Enter valid amount.");
+    return;
+  }
+
+  const userRef = ref(database, 'users/' + user.uid);
+  get(userRef).then(snapshot => {
+    const data = snapshot.val();
+    const maxWithdrawable = (data.totalTurnover || 0) - (data.withdrawnAmount || 0);
+    const balance = data.balance || 0;
+
+    if (withdrawAmount > balance) {
+      alert("Insufficient balance.");
+    } else if (withdrawAmount > maxWithdrawable) {
+      alert(`You can withdraw maximum ৳${maxWithdrawable} based on your gameplay.`);
+    } else {
+      const newBalance = balance - withdrawAmount;
+      const newWithdrawn = (data.withdrawnAmount || 0) + withdrawAmount;
+
+      update(userRef, {
+        balance: newBalance,
+        withdrawnAmount: newWithdrawn
+      });
+
+      const txnRef = ref(database, 'transactions/' + user.uid + '/' + Date.now());
+      set(txnRef, {
+        type: 'Withdraw',
+        amount: withdrawAmount,
+        timestamp: Date.now()
+      });
+
+      alert("Withdraw request submitted.");
+      document.getElementById('withdraw-amount').value = "";
+    }
+  });
+};
