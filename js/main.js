@@ -1,79 +1,107 @@
-// Import Firebase
 import { auth, database } from './firebase-config.js';
 import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import {
   ref,
-  onValue,
-  get
+  set,
+  get,
+  update
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-// Hide splash after 3 seconds and show body
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    document.getElementById('splash-screen').style.display = 'none';
-    document.body.style.display = 'block';
-  }, 3000);
-});
+// Show specific auth form
+function showForm(formId) {
+  document.querySelectorAll('.auth-container').forEach(f => f.style.display = 'none');
+  document.getElementById(formId).style.display = 'block';
+}
 
-// Auto scroll banner slider (if exists)
-setInterval(() => {
-  const banner = document.getElementById('home-slider');
-  if (banner) {
-    banner.scrollLeft += 1;
-    if (banner.scrollLeft + banner.clientWidth >= banner.scrollWidth) {
-      banner.scrollLeft = 0;
-    }
+// Register New User
+window.registerUser = function () {
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('register-email').value.trim();
+  const password = document.getElementById('register-password').value.trim();
+  const referralCode = document.getElementById('referral-code').value.trim();
+
+  if (!name || !phone || !email || !password) {
+    alert("Please fill all fields.");
+    return;
   }
-}, 30);
 
-// Show popup menu
-window.showMenuPopup = function () {
-  document.getElementById('popup-menu').style.display = 'block';
-  document.getElementById('overlay').style.display = 'block';
-};
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const uid = userCredential.user.uid;
+      set(ref(database, 'users/' + uid), {
+        name,
+        phone,
+        email,
+        balance: 0,
+        referrer: referralCode || null,
+        referralBonusGiven: false,
+        totalTurnover: 0,
+        withdrawnAmount: 0
+      });
+      alert("Registration successful!");
+      showForm('login-form');
+    })
+    .catch((error) => {
+      alert("Error: " + error.message);
+    });
+}
 
-// Hide overlay + popup
-window.hidePopupMenu = function () {
-  document.getElementById('popup-menu').style.display = 'none';
-  document.getElementById('overlay').style.display = 'none';
-};
+// Login User
+window.loginUser = function () {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
 
-// Show any section/page
-window.showPage = function (id) {
-  document.querySelectorAll('.popup-page').forEach(p => p.style.display = 'none');
-  document.getElementById(id).style.display = 'block';
-
-  // If Profile page, load data
-  if (id === 'profile-page') {
-    loadUserProfile();
+  if (!email || !password) {
+    alert("Please enter both email and password.");
+    return;
   }
-};
 
-// Share app (for mobile)
-window.shareApp = function () {
-  if (navigator.share) {
-    navigator.share({
-      title: "Real Money Game",
-      text: "Come play and win cash!",
-      url: window.location.href
-    }).catch(err => console.log("Share failed:", err));
-  } else {
-    alert("Sharing not supported.");
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('home-page').style.display = 'block';
+    })
+    .catch((error) => {
+      alert("Login failed: " + error.message);
+    });
+}
+
+// Reset Password
+window.sendPasswordReset = function () {
+  const email = document.getElementById('reset-email').value.trim();
+  if (!email) {
+    alert("Enter your email to reset password.");
+    return;
   }
-};
 
-// Load Profile Info
-function loadUserProfile() {
-  const user = auth.currentUser;
-  if (!user) return;
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      alert("Reset email sent! Check your inbox.");
+      showForm('login-form');
+    })
+    .catch((error) => {
+      alert("Error: " + error.message);
+    });
+}
 
-  const userRef = ref(database, 'users/' + user.uid);
-  onValue(userRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      document.getElementById('profile-name').innerText = data.name || '';
-      document.getElementById('profile-email').innerText = data.email || '';
-      document.getElementById('profile-phone').innerText = data.phone || '';
-      document.getElementById('profile-balance').innerText = data.balance || 0;
-    }
+// Logout
+window.logoutUser = function () {
+  signOut(auth).then(() => {
+    alert("Logged out successfully.");
+    showForm('login-form');
+    document.getElementById('home-page').style.display = 'none';
+  }).catch((error) => {
+    alert("Error: " + error.message);
   });
 }
+
+// Initial load
+document.addEventListener('DOMContentLoaded', () => {
+  showForm('login-form');
+});
