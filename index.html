@@ -25,9 +25,102 @@
 </head>
 
 <body>
-  <!-- এখানে তোমার বাকি HTML অংশ (Splash screen, Login, Home page, Game cards, Popup ইত্যাদি) থাকবে -->
-  <!-- আমরা পরের ধাপে এগুলো দিয়ে দিবো -->
+  <!-- Splash Screen -->
+<div id="splash-screen">
+  <div class="splash-logo">Real Money Game</div>
+  <div class="splash-loader"></div>
+  <div class="splash-subtext">Connecting players...</div>
+</div>
 
-  <h1 style="text-align:center; margin-top: 50px;">Welcome to Real Money Game</h1>
+<!-- Login Form -->
+<div id="login-form" class="auth-container" style="display: none;">
+  <h2>Login</h2>
+  <input id="login-email" type="email" placeholder="Email">
+  <input id="login-password" type="password" placeholder="Password">
+  <button onclick="loginUser()">Login</button>
+  <div class="form-switcher" onclick="showForm('register-form')">Don't have an account? <span>Register</span></div>
+  <div class="form-switcher" onclick="showForm('reset-form')">Forgot password? <span>Reset</span></div>
+</div>
+
+<!-- Register Form -->
+<div id="register-form" class="auth-container" style="display: none;">
+  <h2>Register</h2>
+  <input id="name" type="text" placeholder="Your Name">
+  <input id="phone" type="tel" placeholder="Phone">
+  <input id="register-email" type="email" placeholder="Email">
+  <input id="register-password" type="password" placeholder="Password">
+  <button onclick="registerUser()">Register</button>
+  <div class="form-switcher" onclick="showForm('login-form')">Already have an account? <span>Login</span></div>
+</div>
+
+<!-- Reset Password Form -->
+<div id="reset-form" class="auth-container" style="display: none;">
+  <h2>Reset Password</h2>
+  <input id="reset-email" type="email" placeholder="Your Email">
+  <button onclick="sendPasswordReset()">Send Reset Link</button>
+  <div class="form-switcher" onclick="showForm('login-form')">Back to <span>Login</span></div>
+</div>
+
+<!-- Home Page -->
+<div id="home-page" style="display: none;">
+  <div class="game-cards-container">
+    <div class="game-card" onclick="showGamePopup('ludo')">
+      <img src="assets/images/ludo-logo.jpg" class="game-logo" alt="Ludo">
+      <div class="game-title">Ludo</div>
+    </div>
+    <div class="game-card" onclick="showGamePopup('chess')">
+      <img src="assets/images/chess-logo.jpg" class="game-logo" alt="Chess">
+      <div class="game-title">Chess</div>
+    </div>
+    <div class="game-card" onclick="showGamePopup('carrom')">
+      <img src="assets/images/carrom-logo.jpg" class="game-logo" alt="Carrom">
+      <div class="game-title">Carrom</div>
+    </div>
+    <div class="game-card" onclick="showGamePopup('bead16')">
+      <img src="assets/images/bead16-logo.png" class="game-logo" alt="Bead 16">
+      <div class="game-title">Bead 16</div>
+    </div>
+  </div>
+  <button onclick="showMenuPopup()" class="menu-button">☰</button>
+</div>
+
+<!-- Overlay for popups -->
+<div id="overlay" onclick="hidePopupMenu()" style="display: none;"></div>
+
+<!-- Popup Menu -->
+<div id="popup-menu" class="popup-page" style="display: none;">
+  <h3>Menu</h3>
+  <ul>
+    <li onclick="showPage('profile-page')">Profile</li>
+    <li onclick="showPage('contact-page')">Contact</li>
+    <li onclick="logoutUser()">Logout</li>
+  </ul>
+</div>
+
+<!-- Game Popups -->
+<div class="game-popup" id="ludo-popup" style="display: none;">
+  <div id="ludo-slider" class="game-slider"></div>
+  <div class="game-play-options">
+    <button onclick="createPrivateRoom('ludo')">Create Room</button>
+    <button onclick="joinRandomPlayers('ludo')">Join Random</button>
+    <input id="join-code-input-ludo" placeholder="Enter Code">
+    <button onclick="joinPrivateGameWithCode('ludo')">Join with Code</button>
+  </div>
+  <div id="ludo-private-room" style="display: none;">
+    <h3>Room Code: <span id="ludo-room-code"></span></h3>
+    <div id="ludo-players-grid"></div>
+    <button id="ludo-start-private-btn" onclick="startGame('ludo')">Start Game</button>
+    <button onclick="cancelPrivateRoom('ludo')">Cancel Room</button>
+  </div>
+  <div id="ludo-waiting-room" style="display: none;">
+    <h3>Searching Players...</h3>
+    <div>Player 1: <span id="ludo-player1-name"></span></div>
+    <div>Player 2: <span id="ludo-player2-name"></span></div>
+    <button onclick="cancelRandomSearch('ludo')">Cancel</button>
+  </div>
+</div>
+
+<!-- Repeat above block similarly for chess-popup, carrom-popup, bead16-popup if needed -->
+
 </body>
 </html>
