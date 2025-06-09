@@ -120,7 +120,49 @@
   </div>
 </div>
 
-<!-- Repeat above block similarly for chess-popup, carrom-popup, bead16-popup if needed -->
+<!-- Profile Page -->
+<div id="profile-page" class="popup-page" style="display: none;">
+  <h2 style="text-align: center;">👤 My Profile</h2>
+  <div style="padding: 20px;">
+    <p><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
+    <p><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
+    <p><strong>Phone:</strong> <span id="profile-phone">Loading...</span></p>
+    <p><strong>Balance:</strong> ৳<span id="profile-balance">0</span></p>
+    <button onclick="showPage('home-page')">Back</button>
+  </div>
+</div>
+
+<!-- Contact Page -->
+<div id="contact-page" class="popup-page" style="display: none;">
+  <h2 style="text-align: center;">📞 Contact Us</h2>
+  <div style="padding: 20px;">
+    <p>For support or help:</p>
+    <ul>
+      <li>📧 Email: support@realmoneygame.com</li>
+      <li>📱 WhatsApp: +8801234567890</li>
+      <li>🌐 Website: www.realmoneygame.com</li>
+    </ul>
+    <button onclick="showPage('home-page')">Back</button>
+  </div>
+</div>
+
+<!-- Deposit Page (Optional Extra Section) -->
+<div id="deposit-page" class="popup-page" style="display: none;">
+  <h2 style="text-align: center;">💰 Deposit Money</h2>
+  <div style="padding: 20px;">
+    <p>Select payment method:</p>
+    <select>
+      <option>Bkash</option>
+      <option>Nagad</option>
+      <option>Rocket</option>
+    </select>
+    <input type="text" placeholder="Transaction ID">
+    <input type="number" placeholder="Amount (৳)">
+    <button onclick="alert('Request Submitted')">Submit Request</button>
+    <button onclick="showPage('home-page')">Back</button>
+  </div>
+</div>
+
 
 </body>
 </html>
