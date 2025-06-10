@@ -16,12 +16,12 @@
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  <!-- JS -->
-  <script src="js/firebase-config.js" defer></script>
-  <script src="js/auth.js" defer></script>
-  <script src="js/game-popup.js" defer></script>
-  <script src="js/game-functions.js" defer></script>
-  <script src="js/main.js" defer></script>
+  <!-- JS Scripts with module type -->
+  <script src="js/firebase-config.js" defer type="module"></script>
+  <script src="js/auth.js" defer type="module"></script>
+  <script src="js/game-popup.js" defer type="module"></script>
+  <script src="js/game-functions.js" defer type="module"></script>
+  <script src="js/main.js" defer type="module"></script>
 </head>
 
 <body>
@@ -85,7 +85,7 @@
     <button onclick="showMenuPopup()" class="menu-button">☰</button>
   </div>
 
-  <!-- Overlay for popups -->
+  <!-- Overlay -->
   <div id="overlay" onclick="hidePopupMenu()" style="display: none;"></div>
 
   <!-- Popup Menu -->
@@ -101,7 +101,7 @@
     </ul>
   </div>
 
-  <!-- Game Popups -->
+  <!-- Game Popups (Only Ludo for Now) -->
   <div class="game-popup" id="ludo-popup" style="display: none;">
     <div id="ludo-slider" class="game-slider"></div>
     <div class="game-play-options">
