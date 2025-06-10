@@ -36,9 +36,11 @@ window.registerUser = function () {
         name,
         phone,
         email,
-        balance: 0
+        balance: 0,
         referrer: referralCode || null,
-referralBonusGiven: false
+        referralBonusGiven: false,
+        totalTurnover: 0,
+        withdrawnAmount: 0
       });
       alert("Registration successful!");
       showForm('login-form');
