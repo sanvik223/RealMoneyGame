@@ -8,71 +8,113 @@
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css" />
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
   <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- JS -->
+  <script src="js/firebase-config.js" defer type="module"></script>
+  <script src="js/auth.js" defer type="module"></script>
+  <script src="js/game-popup.js" defer type="module"></script>
+  <script src="js/game-functions.js" defer type="module"></script>
+  <script src="js/main.js" defer type="module"></script>
 </head>
+
 <body>
   <!-- Splash Screen -->
   <div id="splash-screen">
     <div class="splash-logo">Real Money Game</div>
     <div class="splash-loader"></div>
-    <div class="splash-subtext">Connecting players securely...</div>
+    <div class="splash-subtext">Connecting players...</div>
   </div>
 
   <!-- Home Page -->
-  <div id="home-page" style="display: none;">
-    <header class="top-bar">
-      <div class="app-logo">💸 RMG</div>
-      <button onclick="showMenuPopup()" class="menu-icon"><i class="fas fa-bars"></i></button>
-    </header>
-
-    <div class="balance-banner">
-      <div class="balance-text">Welcome, <span id="profile-name">Player</span></div>
-      <div class="balance-amount">Balance: ৳<span id="profile-balance">0</span></div>
-    </div>
-
-    <section class="game-section">
-      <h3>🎮 Choose Your Game</h3>
-      <div class="game-grid">
-        <div class="game-card" onclick="showGamePopup('ludo')">
-          <img src="assets/images/ludo-logo.jpg" alt="Ludo" />
-          <span>Ludo</span>
-        </div>
-        <div class="game-card" onclick="showGamePopup('chess')">
-          <img src="assets/images/chess-logo.jpg" alt="Chess" />
-          <span>Chess</span>
-        </div>
-        <div class="game-card" onclick="showGamePopup('carrom')">
-          <img src="assets/images/carrom-logo.jpg" alt="Carrom" />
-          <span>Carrom</span>
-        </div>
-        <div class="game-card" onclick="showGamePopup('bead16')">
-          <img src="assets/images/bead16-logo.png" alt="Bead 16" />
-          <span>Bead 16</span>
-        </div>
+  <div id="home-page" class="app-container">
+    <div class="game-cards-container">
+      <div class="game-card" onclick="showGamePopup('ludo')">
+        <img src="assets/images/ludo-logo.jpg" class="game-logo" alt="Ludo">
+        <div class="game-title">Ludo</div>
       </div>
-    </section>
-
-    <section class="quick-buttons">
-      <button onclick="showPage('deposit-page')"><i class="fas fa-plus-circle"></i> Deposit</button>
-      <button onclick="showPage('reward-history-page')"><i class="fas fa-gift"></i> Rewards</button>
-      <button onclick="showPage('transaction-history-page')"><i class="fas fa-history"></i> Transactions</button>
-    </section>
+      <div class="game-card" onclick="showGamePopup('chess')">
+        <img src="assets/images/chess-logo.jpg" class="game-logo" alt="Chess">
+        <div class="game-title">Chess</div>
+      </div>
+      <div class="game-card" onclick="showGamePopup('carrom')">
+        <img src="assets/images/carrom-logo.jpg" class="game-logo" alt="Carrom">
+        <div class="game-title">Carrom</div>
+      </div>
+      <div class="game-card" onclick="showGamePopup('bead16')">
+        <img src="assets/images/bead16-logo.png" class="game-logo" alt="Bead 16">
+        <div class="game-title">Bead 16</div>
+      </div>
+    </div>
+    <button onclick="showMenuPopup()" class="menu-button">☰</button>
   </div>
 
-  <!-- Popup Menu -->
-  <div id="popup-menu" class="popup-menu" style="display: none;">
+  <!-- Menu Popup -->
+  <div id="popup-menu" class="popup-page">
+    <h3>Menu</h3>
     <ul>
-      <li onclick="showPage('profile-page')">👤 Profile</li>
-      <li onclick="showPage('contact-page')">📞 Contact</li>
-      <li onclick="logoutUser()">🚪 Logout</li>
+      <li onclick="showPage('profile-page')">Profile</li>
+      <li onclick="showPage('deposit-page')">Deposit</li>
+      <li onclick="showPage('reward-history-page'); loadRewardHistory();">Reward History</li>
+      <li onclick="showPage('transaction-history-page'); loadTransactionHistory();">Transaction History</li>
+      <li onclick="showPage('contact-page')">Contact</li>
+      <li onclick="logoutUser()">Logout</li>
     </ul>
   </div>
 
-  <!-- Overlay -->
-  <div id="overlay" onclick="hidePopupMenu()" style="display: none;"></div>
+  <!-- Profile Page -->
+  <div id="profile-page" class="popup-page">
+    <h2>👤 My Profile</h2>
+    <div id="profile-details">
+      <p><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
+      <p><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
+      <p><strong>Phone:</strong> <span id="profile-phone">Loading...</span></p>
+      <p><strong>Balance:</strong> ৳<span id="profile-balance">0</span></p>
+      <input id="withdraw-amount" type="number" placeholder="Withdraw Amount">
+      <button onclick="submitWithdraw()">Withdraw</button>
+      <button onclick="showPage('home-page')">Back</button>
+    </div>
+  </div>
 
-  <!-- JS (to be connected later) -->
-  <script src="js/main.js" type="module" defer></script>
+  <!-- Deposit Page -->
+  <div id="deposit-page" class="popup-page">
+    <h2>💰 Deposit Money</h2>
+    <div class="deposit-method-card" onclick="selectMethod('Bkash')">
+      <span id="bonus-Bkash" class="bonus-label">+0% Bonus</span>
+      <img src="assets/images/bkash.png">
+      <div>Bkash</div>
+    </div>
+    <div class="deposit-method-card" onclick="selectMethod('Nagad')">
+      <span id="bonus-Nagad" class="bonus-label">+0% Bonus</span>
+      <img src="assets/images/nagad.png">
+      <div>Nagad</div>
+    </div>
+    <div class="deposit-method-card" onclick="selectMethod('Rocket')">
+      <span id="bonus-Rocket" class="bonus-label">+0% Bonus</span>
+      <img src="assets/images/rocket.png">
+      <div>Rocket</div>
+    </div>
+    <div class="deposit-method-card" onclick="selectMethod('Binance')">
+      <span id="bonus-Binance" class="bonus-label">+0% Bonus</span>
+      <img src="assets/images/binance.png">
+      <div>Binance Pay</div>
+    </div>
+    <input type="text" id="deposit-trx" placeholder="Transaction ID">
+    <input type="number" id="deposit-amount" placeholder="Amount (৳)">
+    <select id="deposit-method">
+      <option value="Bkash">Bkash</option>
+      <option value="Nagad">Nagad</option>
+      <option value="Rocket">Rocket</option>
+      <option value="Binance">Binance Pay</option>
+    </select>
+    <button onclick="submitDepositRequest()">Submit Request</button>
+    <button onclick="showPage('home-page')">Back</button>
+  </div>
 </body>
 </html>
