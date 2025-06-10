@@ -16,12 +16,12 @@
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  <!-- JS -->
-  <script src="js/firebase-config.js" defer type="module"></script>
-  <script src="js/auth.js" defer type="module"></script>
-  <script src="js/game-popup.js" defer type="module"></script>
-  <script src="js/game-functions.js" defer type="module"></script>
-  <script src="js/main.js" defer type="module"></script>
+  <!-- JS (as modules) -->
+  <script type="module" src="js/firebase-config.js" defer></script>
+  <script type="module" src="js/auth.js" defer></script>
+  <script type="module" src="js/game-popup.js" defer></script>
+  <script type="module" src="js/game-functions.js" defer></script>
+  <script type="module" src="js/main.js" defer></script>
 </head>
 
 <body>
@@ -32,31 +32,64 @@
     <div class="splash-subtext">Connecting players...</div>
   </div>
 
+  <!-- Login Form -->
+  <div id="login-form" class="auth-container" style="display: none;">
+    <h2>Login</h2>
+    <input id="login-email" type="email" placeholder="Email" />
+    <input id="login-password" type="password" placeholder="Password" />
+    <button onclick="loginUser()">Login</button>
+    <div class="form-switcher" onclick="showForm('register-form')">Don't have an account? <span>Register</span></div>
+    <div class="form-switcher" onclick="showForm('reset-form')">Forgot password? <span>Reset</span></div>
+  </div>
+
+  <!-- Register Form -->
+  <div id="register-form" class="auth-container" style="display: none;">
+    <h2>Register</h2>
+    <input id="name" type="text" placeholder="Your Name" />
+    <input id="phone" type="tel" placeholder="Phone" />
+    <input id="register-email" type="email" placeholder="Email" />
+    <input id="register-password" type="password" placeholder="Password" />
+    <input id="referral-code" type="text" placeholder="Referral Code (optional)" />
+    <button onclick="registerUser()">Register</button>
+    <div class="form-switcher" onclick="showForm('login-form')">Already have an account? <span>Login</span></div>
+  </div>
+
+  <!-- Reset Password -->
+  <div id="reset-form" class="auth-container" style="display: none;">
+    <h2>Reset Password</h2>
+    <input id="reset-email" type="email" placeholder="Your Email" />
+    <button onclick="sendPasswordReset()">Send Reset Link</button>
+    <div class="form-switcher" onclick="showForm('login-form')">Back to <span>Login</span></div>
+  </div>
+
   <!-- Home Page -->
-  <div id="home-page" class="app-container">
+  <div id="home-page" style="display: none;">
     <div class="game-cards-container">
       <div class="game-card" onclick="showGamePopup('ludo')">
-        <img src="assets/images/ludo-logo.jpg" class="game-logo" alt="Ludo">
+        <img src="assets/images/ludo-logo.jpg" class="game-logo" />
         <div class="game-title">Ludo</div>
       </div>
       <div class="game-card" onclick="showGamePopup('chess')">
-        <img src="assets/images/chess-logo.jpg" class="game-logo" alt="Chess">
+        <img src="assets/images/chess-logo.jpg" class="game-logo" />
         <div class="game-title">Chess</div>
       </div>
       <div class="game-card" onclick="showGamePopup('carrom')">
-        <img src="assets/images/carrom-logo.jpg" class="game-logo" alt="Carrom">
+        <img src="assets/images/carrom-logo.jpg" class="game-logo" />
         <div class="game-title">Carrom</div>
       </div>
       <div class="game-card" onclick="showGamePopup('bead16')">
-        <img src="assets/images/bead16-logo.png" class="game-logo" alt="Bead 16">
+        <img src="assets/images/bead16-logo.png" class="game-logo" />
         <div class="game-title">Bead 16</div>
       </div>
     </div>
     <button onclick="showMenuPopup()" class="menu-button">☰</button>
   </div>
 
-  <!-- Menu Popup -->
-  <div id="popup-menu" class="popup-page">
+  <!-- Overlay -->
+  <div id="overlay" onclick="hidePopupMenu()" style="display: none;"></div>
+
+  <!-- Popup Menu -->
+  <div id="popup-menu" class="popup-page" style="display: none;">
     <h3>Menu</h3>
     <ul>
       <li onclick="showPage('profile-page')">Profile</li>
@@ -69,52 +102,83 @@
   </div>
 
   <!-- Profile Page -->
-  <div id="profile-page" class="popup-page">
-    <h2>👤 My Profile</h2>
-    <div id="profile-details">
+  <div id="profile-page" class="popup-page" style="display: none;">
+    <h2 style="text-align:center;">👤 My Profile</h2>
+    <div style="padding: 20px;">
       <p><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
       <p><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
       <p><strong>Phone:</strong> <span id="profile-phone">Loading...</span></p>
       <p><strong>Balance:</strong> ৳<span id="profile-balance">0</span></p>
-      <input id="withdraw-amount" type="number" placeholder="Withdraw Amount">
-      <button onclick="submitWithdraw()">Withdraw</button>
+      <input id="withdraw-amount" type="number" placeholder="Withdraw Amount" />
+      <button onclick="submitWithdraw()">Withdraw</button><br><br>
       <button onclick="showPage('home-page')">Back</button>
     </div>
   </div>
 
   <!-- Deposit Page -->
-  <div id="deposit-page" class="popup-page">
-    <h2>💰 Deposit Money</h2>
-    <div class="deposit-method-card" onclick="selectMethod('Bkash')">
-      <span id="bonus-Bkash" class="bonus-label">+0% Bonus</span>
-      <img src="assets/images/bkash.png">
-      <div>Bkash</div>
+  <div id="deposit-page" class="popup-page" style="display: none;">
+    <h2 style="text-align:center;">💰 Deposit Money</h2>
+    <div style="padding: 20px;">
+      <div class="deposit-method-card" onclick="selectMethod('Bkash')">
+        <span class="bonus-label" id="bonus-Bkash">+0% Bonus</span>
+        <img src="assets/images/bkash.png" />
+        <div>Bkash</div>
+      </div>
+      <div class="deposit-method-card" onclick="selectMethod('Nagad')">
+        <span class="bonus-label" id="bonus-Nagad">+0% Bonus</span>
+        <img src="assets/images/nagad.png" />
+        <div>Nagad</div>
+      </div>
+      <div class="deposit-method-card" onclick="selectMethod('Rocket')">
+        <span class="bonus-label" id="bonus-Rocket">+0% Bonus</span>
+        <img src="assets/images/rocket.png" />
+        <div>Rocket</div>
+      </div>
+      <div class="deposit-method-card" onclick="selectMethod('Binance')">
+        <span class="bonus-label" id="bonus-Binance">+0% Bonus</span>
+        <img src="assets/images/binance.png" />
+        <div>Binance Pay</div>
+      </div>
+      <br>
+      <input type="text" id="deposit-trx" placeholder="Transaction ID" /><br><br>
+      <input type="number" id="deposit-amount" placeholder="Amount (৳)" /><br><br>
+      <select id="deposit-method">
+        <option value="Bkash">Bkash</option>
+        <option value="Nagad">Nagad</option>
+        <option value="Rocket">Rocket</option>
+        <option value="Binance">Binance Pay</option>
+      </select><br><br>
+      <button onclick="submitDepositRequest()">Submit Request</button>
+      <button onclick="showPage('home-page')">Back</button>
     </div>
-    <div class="deposit-method-card" onclick="selectMethod('Nagad')">
-      <span id="bonus-Nagad" class="bonus-label">+0% Bonus</span>
-      <img src="assets/images/nagad.png">
-      <div>Nagad</div>
-    </div>
-    <div class="deposit-method-card" onclick="selectMethod('Rocket')">
-      <span id="bonus-Rocket" class="bonus-label">+0% Bonus</span>
-      <img src="assets/images/rocket.png">
-      <div>Rocket</div>
-    </div>
-    <div class="deposit-method-card" onclick="selectMethod('Binance')">
-      <span id="bonus-Binance" class="bonus-label">+0% Bonus</span>
-      <img src="assets/images/binance.png">
-      <div>Binance Pay</div>
-    </div>
-    <input type="text" id="deposit-trx" placeholder="Transaction ID">
-    <input type="number" id="deposit-amount" placeholder="Amount (৳)">
-    <select id="deposit-method">
-      <option value="Bkash">Bkash</option>
-      <option value="Nagad">Nagad</option>
-      <option value="Rocket">Rocket</option>
-      <option value="Binance">Binance Pay</option>
-    </select>
-    <button onclick="submitDepositRequest()">Submit Request</button>
+  </div>
+
+  <!-- Reward History -->
+  <div id="reward-history-page" class="popup-page" style="display: none;">
+    <h2 style="text-align:center;">🎁 Reward History</h2>
+    <div id="reward-list" style="padding: 15px;">Loading...</div>
     <button onclick="showPage('home-page')">Back</button>
+  </div>
+
+  <!-- Transaction History -->
+  <div id="transaction-history-page" class="popup-page" style="display: none;">
+    <h2 style="text-align:center;">📋 Transaction History</h2>
+    <div id="transaction-list" style="padding: 15px;">Loading...</div>
+    <button onclick="showPage('home-page')">Back</button>
+  </div>
+
+  <!-- Contact -->
+  <div id="contact-page" class="popup-page" style="display: none;">
+    <h2 style="text-align:center;">📞 Contact Us</h2>
+    <div style="padding: 20px;">
+      <p>For help or support:</p>
+      <ul>
+        <li>📧 support@realmoneygame.com</li>
+        <li>📱 +8801234567890</li>
+        <li>🌐 www.realmoneygame.com</li>
+      </ul>
+      <button onclick="showPage('home-page')">Back</button>
+    </div>
   </div>
 </body>
 </html>
