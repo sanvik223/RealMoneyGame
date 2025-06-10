@@ -97,31 +97,38 @@
       </ul>
       <button onclick="showPage('home-page')">Back</button>
     </div>
-  </div>  <!-- Deposit Page -->  <div id="deposit-page" class="popup-page" style="display: none;">
-    <h2 style="text-align: center;">💰 Deposit Money</h2>
-    <div style="padding: 20px;">
-      <div class="deposit-method-card" onclick="selectMethod('Bkash')">
-        <span class="bonus-label" id="bonus-Bkash">+0% Bonus</span>
-        <img src="assets/images/bkash.png">
-        <div>Bkash</div>
-      </div>
-      <div class="deposit-method-card" onclick="selectMethod('Nagad')">
-        <span class="bonus-label" id="bonus-Nagad">+0% Bonus</span>
-        <img src="assets/images/nagad.png">
-        <div>Nagad</div>
-      </div>
-      <div class="deposit-method-card" onclick="selectMethod('Rocket')">
-        <span class="bonus-label" id="bonus-Rocket">+0% Bonus</span>
-        <img src="assets/images/rocket.png">
-        <div>Rocket</div>
-      </div>
+  </div>  <!-- Deposit Method Cards -->
+<div class="deposit-method-card" onclick="selectMethod('Bkash')">
+  <span class="bonus-label" id="bonus-Bkash">+0% Bonus</span>
+  <img src="assets/images/bkash.png">
+  <div>Bkash</div>
+</div>
+
+<div class="deposit-method-card" onclick="selectMethod('Nagad')">
+  <span class="bonus-label" id="bonus-Nagad">+0% Bonus</span>
+  <img src="assets/images/nagad.png">
+  <div>Nagad</div>
+</div>
+
+<div class="deposit-method-card" onclick="selectMethod('Rocket')">
+  <span class="bonus-label" id="bonus-Rocket">+0% Bonus</span>
+  <img src="assets/images/rocket.png">
+  <div>Rocket</div>
+</div>
+
+<div class="deposit-method-card" onclick="selectMethod('Binance')">
+  <span class="bonus-label" id="bonus-Binance">+0% Bonus</span>
+  <img src="assets/images/binance.png">
+  <div>Binance Pay</div>
+</div>
       <input type="text" id="deposit-trx" placeholder="Transaction ID">
       <input type="number" id="deposit-amount" placeholder="Amount (৳)">
       <select id="deposit-method">
-        <option value="Bkash">Bkash</option>
-        <option value="Nagad">Nagad</option>
-        <option value="Rocket">Rocket</option>
-      </select>
+  <option value="Bkash">Bkash</option>
+  <option value="Nagad">Nagad</option>
+  <option value="Rocket">Rocket</option>
+  <option value="Binance">Binance Pay</option>
+</select>
       <button onclick="submitDepositRequest()">Submit Request</button>
       <button onclick="showPage('home-page')">Back</button>
     </div>
