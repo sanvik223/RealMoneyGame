@@ -65,7 +65,6 @@ window.shareApp = function () {
 function loadUserProfile() {
   const user = auth.currentUser;
   if (!user) return;
-
   const userRef = ref(database, 'users/' + user.uid);
   onValue(userRef, (snapshot) => {
     const data = snapshot.val();
@@ -86,13 +85,11 @@ window.submitWithdraw = function () {
     alert("Enter valid amount.");
     return;
   }
-
   const userRef = ref(database, 'users/' + user.uid);
   get(userRef).then(snapshot => {
     const data = snapshot.val();
     const maxWithdrawable = (data.totalTurnover || 0) - (data.withdrawnAmount || 0);
     const balance = data.balance || 0;
-
     if (withdrawAmount > balance) {
       alert("Insufficient balance.");
     } else if (withdrawAmount > maxWithdrawable) {
@@ -100,19 +97,16 @@ window.submitWithdraw = function () {
     } else {
       const newBalance = balance - withdrawAmount;
       const newWithdrawn = (data.withdrawnAmount || 0) + withdrawAmount;
-
       update(userRef, {
         balance: newBalance,
         withdrawnAmount: newWithdrawn
       });
-
       const txnRef = ref(database, 'transactions/' + user.uid + '/' + Date.now());
       set(txnRef, {
         type: 'Withdraw',
         amount: withdrawAmount,
         timestamp: Date.now()
       });
-
       alert("Withdraw request submitted.");
       document.getElementById('withdraw-amount').value = "";
     }
@@ -125,16 +119,13 @@ window.submitDepositRequest = function () {
   const amount = parseInt(document.getElementById('deposit-amount').value);
   const method = document.getElementById('deposit-method').value;
   const trxId = document.getElementById('deposit-trx').value.trim();
-
   if (!user || isNaN(amount) || amount <= 0 || !method || !trxId) {
     alert("Please fill all fields correctly.");
     return;
   }
-
   const uid = user.uid;
   const userRef = ref(database, 'users/' + uid);
   const bonusRatesRef = ref(database, 'bonusRates/' + method);
-
   get(userRef).then(userSnap => {
     const userData = userSnap.val() || {};
     get(bonusRatesRef).then(bonusSnap => {
@@ -142,9 +133,7 @@ window.submitDepositRequest = function () {
       const bonus = Math.floor((amount * bonusPercent) / 100);
       const total = amount + bonus;
       const newBalance = (userData.balance || 0) + total;
-
       update(userRef, { balance: newBalance });
-
       const txnRef = ref(database, 'transactions/' + uid + '/' + Date.now());
       set(txnRef, {
         type: "Deposit",
@@ -155,9 +144,7 @@ window.submitDepositRequest = function () {
         trxId,
         timestamp: Date.now()
       });
-
       alert(`Deposit submitted!\nAmount: ৳${amount}\nBonus: ৳${bonus}\nTotal Added: ৳${total}`);
-
       document.getElementById('deposit-amount').value = '';
       document.getElementById('deposit-trx').value = '';
     });
@@ -180,6 +167,42 @@ function loadBonusRates() {
     }
   });
 }
+
+// 🎁 Load Reward History
+window.loadRewardHistory = function () {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const rewardRef = ref(database, 'transactions/' + user.uid);
+  get(rewardRef).then(snapshot => {
+    const data = snapshot.val();
+    let html = '';
+    for (let key in data) {
+      const tx = data[key];
+      if (tx.type === 'Referral Bonus' || tx.type === 'Reward') {
+        html += `<p><strong>${tx.type}:</strong> ৳${tx.amount} <br><small>${new Date(tx.timestamp).toLocaleString()}</small></p><hr>`;
+      }
+    }
+    document.getElementById('reward-list').innerHTML = html || 'No rewards found.';
+  });
+};
+
+// 📋 Load Transaction History
+window.loadTransactionHistory = function () {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const txnRef = ref(database, 'transactions/' + user.uid);
+  get(txnRef).then(snapshot => {
+    const data = snapshot.val();
+    let html = '';
+    for (let key in data) {
+      const tx = data[key];
+      html += `<p><strong>${tx.type}</strong> (${tx.method || ''}) : ৳${tx.amount} ${tx.bonus ? `(+৳${tx.bonus} Bonus)` : ''}<br><small>${new Date(tx.timestamp).toLocaleString()}</small></p><hr>`;
+    }
+    document.getElementById('transaction-list').innerHTML = html || 'No transactions found.';
+  });
+};
 
 // 🚀 Call on page load
 document.addEventListener('DOMContentLoaded', () => {
