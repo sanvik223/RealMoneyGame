@@ -43,7 +43,6 @@ window.showPage = function (id) {
   document.querySelectorAll('.popup-page').forEach(p => p.style.display = 'none');
   document.getElementById(id).style.display = 'block';
 
-  // Profile page load
   if (id === 'profile-page') {
     loadUserProfile();
   }
@@ -120,6 +119,51 @@ window.submitWithdraw = function () {
   });
 };
 
+// 💰 Deposit with bonus logic
+window.submitDepositRequest = function () {
+  const user = auth.currentUser;
+  const amount = parseInt(document.getElementById('deposit-amount').value);
+  const method = document.getElementById('deposit-method').value;
+  const trxId = document.getElementById('deposit-trx').value.trim();
+
+  if (!user || isNaN(amount) || amount <= 0 || !method || !trxId) {
+    alert("Please fill all fields correctly.");
+    return;
+  }
+
+  const uid = user.uid;
+  const userRef = ref(database, 'users/' + uid);
+  const bonusRatesRef = ref(database, 'bonusRates/' + method);
+
+  get(userRef).then(userSnap => {
+    const userData = userSnap.val() || {};
+    get(bonusRatesRef).then(bonusSnap => {
+      const bonusPercent = bonusSnap.exists() ? bonusSnap.val() : 0;
+      const bonus = Math.floor((amount * bonusPercent) / 100);
+      const total = amount + bonus;
+      const newBalance = (userData.balance || 0) + total;
+
+      update(userRef, { balance: newBalance });
+
+      const txnRef = ref(database, 'transactions/' + uid + '/' + Date.now());
+      set(txnRef, {
+        type: "Deposit",
+        method,
+        amount,
+        bonus,
+        total,
+        trxId,
+        timestamp: Date.now()
+      });
+
+      alert(`Deposit submitted!\nAmount: ৳${amount}\nBonus: ৳${bonus}\nTotal Added: ৳${total}`);
+
+      document.getElementById('deposit-amount').value = '';
+      document.getElementById('deposit-trx').value = '';
+    });
+  });
+};
+
 // 📊 Load Bonus Rates from Firebase and show in cards
 function loadBonusRates() {
   const ratesRef = ref(database, 'bonusRates');
@@ -127,8 +171,8 @@ function loadBonusRates() {
     const rates = snapshot.val();
     if (rates) {
       ['Bkash', 'Nagad', 'Rocket', 'Binance'].forEach(method => {
-        const rate = rates[method] || 0;
         const label = document.getElementById(`bonus-${method}`);
+        const rate = rates[method] || 0;
         if (label) {
           label.innerText = `+${rate}% Bonus`;
         }
@@ -137,7 +181,7 @@ function loadBonusRates() {
   });
 }
 
-// 🚀 Call on load
+// 🚀 Call on page load
 document.addEventListener('DOMContentLoaded', () => {
   loadBonusRates();
 });
