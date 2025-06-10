@@ -119,3 +119,25 @@ window.submitWithdraw = function () {
     }
   });
 };
+
+// 📊 Load Bonus Rates from Firebase and show in cards
+function loadBonusRates() {
+  const ratesRef = ref(database, 'bonusRates');
+  onValue(ratesRef, (snapshot) => {
+    const rates = snapshot.val();
+    if (rates) {
+      ['Bkash', 'Nagad', 'Rocket', 'Binance'].forEach(method => {
+        const rate = rates[method] || 0;
+        const label = document.getElementById(`bonus-${method}`);
+        if (label) {
+          label.innerText = `+${rate}% Bonus`;
+        }
+      });
+    }
+  });
+}
+
+// 🚀 Call on load
+document.addEventListener('DOMContentLoaded', () => {
+  loadBonusRates();
+});
